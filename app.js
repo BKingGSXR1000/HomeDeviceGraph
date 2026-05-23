@@ -391,12 +391,15 @@ function render(){
       if(e.shiftKey){
         focusSel.has(n.id)?focusSel.delete(n.id):focusSel.add(n.id)
       }
+      else if(focusSel.size===1&&focusSel.has(n.id)){
+        focusSel.clear()
+      }
       else{
         focusSel.clear();
         focusSel.add(n.id)
       }
       render();
-      msg('Highlight mode: right-click empty space to clear.')
+      msg(focusSel.size?'Highlight mode: right-click highlighted node or empty space to clear.':'Highlight mode cleared.')
     }
     ;
     g.onpointerdown=e=>{
