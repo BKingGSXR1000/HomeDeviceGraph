@@ -1,0 +1,650 @@
+{
+  "nodes": [
+    {
+      "id": "id_o9f16sy",
+      "name": "Magenta Home Box Fiber",
+      "type": "router",
+      "kind": "router",
+      "portCount": 4,
+      "subtitle": "Internet gateway",
+      "notes": "Main internet router. LAN1 connected to Fritzbox LAN1.",
+      "x": 120,
+      "y": 220
+    },
+    {
+      "id": "id_607um3s",
+      "name": "FRITZ!Box 6690 Cable",
+      "type": "router",
+      "kind": "router",
+      "portCount": 4,
+      "subtitle": "Secondary router / network device",
+      "notes": "Connected to Magenta router via Ethernet LAN1 ↔ LAN1.",
+      "x": 420,
+      "y": 220
+    },
+    {
+      "id": "id_afxo87v",
+      "name": "Small switch",
+      "type": "infra",
+      "kind": "switch",
+      "portCount": 5,
+      "subtitle": "Ethernet switch",
+      "notes": "Connected to Magenta router. Home Assistant and shelf webcam are connected here.",
+      "x": 120,
+      "y": 430
+    },
+    {
+      "id": "id_zstwhsw",
+      "name": "Home Assistant",
+      "type": "client",
+      "kind": "homeassistant",
+      "subtitle": "Ethernet via small switch",
+      "notes": "Connected to the small switch.",
+      "x": 390,
+      "y": 400
+    },
+    {
+      "id": "id_uibzu1z",
+      "name": "Eckzimmer Webcam auf dem Regal",
+      "type": "client",
+      "kind": "webcam",
+      "subtitle": "Ethernet via small switch",
+      "notes": "Connected to the small switch.",
+      "x": 390,
+      "y": 510
+    },
+    {
+      "id": "id_cveyn9l",
+      "name": "Desktop PC",
+      "type": "client",
+      "kind": "desktop",
+      "subtitle": "Ethernet client",
+      "notes": "Connected directly to Magenta router.",
+      "x": 120,
+      "y": 40
+    },
+    {
+      "id": "id_nqbjm16",
+      "name": "PS5 Eckzimmer",
+      "type": "client",
+      "kind": "console",
+      "subtitle": "Ethernet client",
+      "notes": "Connected directly to Magenta router.",
+      "x": 120,
+      "y": 110
+    },
+    {
+      "id": "id_2h4bmmy",
+      "name": "Expleo Laptop",
+      "type": "client",
+      "kind": "laptop",
+      "subtitle": "Ethernet client",
+      "notes": "Connected to Fritzbox via Ethernet.",
+      "x": 720,
+      "y": 190
+    },
+    {
+      "id": "id_d9tl94a",
+      "name": "Eckzimmer Webcam Überblick",
+      "type": "client",
+      "kind": "webcam",
+      "subtitle": "Wi-Fi webcam",
+      "notes": "Connected to Magenta router via Wi-Fi.",
+      "x": 420,
+      "y": 40
+    },
+    {
+      "id": "id_0v1kmrm",
+      "name": "Brother MFC-L2750DW",
+      "type": "client",
+      "kind": "printer",
+      "subtitle": "Wi-Fi laser printer",
+      "notes": "Connected to Magenta router via Wi-Fi.",
+      "x": 420,
+      "y": 110
+    },
+    {
+      "id": "id_sibndzb",
+      "name": "Canon PIXMA G550",
+      "type": "client",
+      "kind": "printer",
+      "subtitle": "USB inkjet printer",
+      "notes": "Connected via USB to Desktop PC.",
+      "x": 390,
+      "y": -80
+    },
+    {
+      "id": "id_eh85v9o",
+      "name": "Audio switch",
+      "type": "infra",
+      "kind": "audio",
+      "subtitle": "2-input audio switch",
+      "notes": "Input 1 Desktop PC audio, Input 2 Expleo Laptop audio. Output to 2.1 speakers.",
+      "x": 720,
+      "y": 360
+    },
+    {
+      "id": "id_jl762kd",
+      "name": "2.1 Speaker set",
+      "type": "client",
+      "kind": "speakers",
+      "subtitle": "Audio output",
+      "notes": "Connected to output of audio switch.",
+      "x": 990,
+      "y": 360
+    },
+    {
+      "id": "id_ho4lrm0",
+      "name": "Peripheral switch",
+      "type": "infra",
+      "kind": "usb",
+      "subtitle": "USB peripheral switch",
+      "notes": "Inputs: mouse dongle, USB keyboard, Logitech C270 webcam. Outputs: Expleo Laptop and Desktop PC.",
+      "x": 720,
+      "y": 520
+    },
+    {
+      "id": "id_xg5my8k",
+      "name": "Wireless mouse dongle",
+      "type": "client",
+      "kind": "mouse",
+      "subtitle": "USB input device",
+      "notes": "Connected to peripheral switch input.",
+      "x": 990,
+      "y": 470
+    },
+    {
+      "id": "id_n6m5rje",
+      "name": "USB keyboard",
+      "type": "client",
+      "kind": "keyboard",
+      "subtitle": "USB input device",
+      "notes": "Connected to peripheral switch input.",
+      "x": 990,
+      "y": 580
+    },
+    {
+      "id": "id_j3s0q27",
+      "name": "Logitech C270 webcam",
+      "type": "client",
+      "kind": "webcam",
+      "subtitle": "USB webcam",
+      "notes": "Connected to peripheral switch input.",
+      "x": 990,
+      "y": 690
+    },
+    {
+      "id": "id_ff9trfy",
+      "name": "Jackery Powerstation",
+      "type": "client",
+      "kind": "powerstation",
+      "subtitle": "Wi-Fi device",
+      "notes": "Connected to Magenta router via Wi-Fi.",
+      "x": 420,
+      "y": 590
+    },
+    {
+      "id": "id_osf7y6p",
+      "name": "FRITZ!Repeater 6000",
+      "type": "infra",
+      "kind": "repeater",
+      "portCount": 2,
+      "subtitle": "Wohnzimmer Wi-Fi repeater",
+      "notes": "Located in Wohnzimmer. Connected to Fritzbox via Wi-Fi.",
+      "x": 1540,
+      "y": 80
+    },
+    {
+      "id": "id_4md0r31",
+      "name": "PS5 Wohnzimmer",
+      "type": "client",
+      "kind": "console",
+      "subtitle": "Wi-Fi console",
+      "notes": "Located in Wohnzimmer. Connected to FRITZ!Repeater via Wi-Fi.",
+      "x": 1820,
+      "y": 40
+    },
+    {
+      "id": "id_oz3xi5l",
+      "name": "TV Hisense",
+      "type": "client",
+      "kind": "tv",
+      "subtitle": "Wi-Fi TV",
+      "notes": "Located in Wohnzimmer. Connected to FRITZ!Repeater via Wi-Fi.",
+      "x": 1820,
+      "y": 160
+    },
+    {
+      "id": "id_yimax4f",
+      "name": "Quest 3",
+      "type": "client",
+      "kind": "vr",
+      "subtitle": "Wi-Fi VR headset",
+      "notes": "Group: Überall. Connected to Magenta router via Wi-Fi.",
+      "x": 2250,
+      "y": 620
+    },
+    {
+      "id": "id_dpc3pz0",
+      "name": "iPhone",
+      "type": "client",
+      "kind": "phone",
+      "subtitle": "Wi-Fi phone",
+      "notes": "Group: Überall. Connected via FRITZ!Repeater.",
+      "x": 2530,
+      "y": 620
+    },
+    {
+      "id": "id_njsllmy",
+      "name": "Poco Phone",
+      "type": "client",
+      "kind": "phone",
+      "subtitle": "Wi-Fi phone",
+      "notes": "Group: Überall. Connected via FRITZ!Repeater.",
+      "x": 2530,
+      "y": 740
+    },
+    {
+      "id": "id_rj26k5u",
+      "name": "Alexa Wohnzimmer",
+      "type": "client",
+      "kind": "speakers",
+      "subtitle": "Wi-Fi smart speaker",
+      "notes": "Located in Wohnzimmer. Connected to Magenta router via Wi-Fi.",
+      "x": 1540,
+      "y": 280
+    },
+    {
+      "id": "id_2xpnq8x",
+      "name": "ESPHome Nuki Bridge",
+      "type": "client",
+      "kind": "homeassistant",
+      "subtitle": "Wi-Fi / Bluetooth bridge",
+      "notes": "Located in Wohnzimmer. Connected to Magenta router via Wi-Fi and to Nuki Türöffner via Bluetooth.",
+      "x": 1540,
+      "y": 400
+    },
+    {
+      "id": "id_yg8daz2",
+      "name": "Ring Türöffner",
+      "type": "client",
+      "kind": "lock",
+      "subtitle": "Door device",
+      "notes": "Located at Eingang. Connected to Magenta router.",
+      "x": 1540,
+      "y": 1040
+    },
+    {
+      "id": "id_ou9jkvt",
+      "name": "Nuki Türöffner",
+      "type": "client",
+      "kind": "lock",
+      "subtitle": "Bluetooth door opener",
+      "notes": "Located at Eingang. Connected via Bluetooth to iPhone and ESPHome Nuki Bridge.",
+      "x": 1820,
+      "y": 1040
+    },
+    {
+      "id": "id_rf0ur4u",
+      "name": "TV Sharp",
+      "type": "client",
+      "kind": "tv",
+      "subtitle": "TV",
+      "notes": "Located in Eckzimmer. Connected to Google Chromecast via USB.",
+      "x": 720,
+      "y": 40
+    },
+    {
+      "id": "id_3gmgcxm",
+      "name": "Google Chromecast",
+      "type": "client",
+      "kind": "streaming",
+      "subtitle": "Wi-Fi / USB streaming device",
+      "notes": "Connected to TV Sharp via USB and to Magenta router via Wi-Fi.",
+      "x": 720,
+      "y": 140
+    },
+    {
+      "id": "id_df24465",
+      "name": "Mini-PC",
+      "type": "client",
+      "kind": "desktop",
+      "subtitle": "Ethernet client",
+      "notes": "Located in Wohnzimmer. Connected to FRITZ!Repeater via Ethernet/LAN.",
+      "x": 1820,
+      "y": 280
+    },
+    {
+      "id": "id_83ab5d7",
+      "name": "Webcam Loggia",
+      "type": "client",
+      "kind": "webcam",
+      "subtitle": "Wi-Fi webcam",
+      "notes": "Located on the Loggia. Connected to Magenta router via Wi-Fi.",
+      "x": 2250,
+      "y": 1040
+    },
+    {
+      "id": "id_90b8857",
+      "name": "Anker Solix Solar",
+      "type": "client",
+      "kind": "powerstation",
+      "subtitle": "Wi-Fi solar device",
+      "notes": "Located on the Loggia. Connected to Magenta router via Wi-Fi.",
+      "x": 2530,
+      "y": 1040
+    }
+  ],
+  "groups": [
+    {
+      "id": "id_axmf5vn",
+      "name": "Eckzimmer",
+      "nodeIds": [
+        "id_o9f16sy",
+        "id_607um3s",
+        "id_afxo87v",
+        "id_zstwhsw",
+        "id_uibzu1z",
+        "id_cveyn9l",
+        "id_nqbjm16",
+        "id_2h4bmmy",
+        "id_d9tl94a",
+        "id_0v1kmrm",
+        "id_sibndzb",
+        "id_eh85v9o",
+        "id_jl762kd",
+        "id_ho4lrm0",
+        "id_xg5my8k",
+        "id_n6m5rje",
+        "id_j3s0q27",
+        "id_ff9trfy",
+        "id_rf0ur4u",
+        "id_3gmgcxm"
+      ]
+    },
+    {
+      "id": "id_xo925xn",
+      "name": "Wohnzimmer",
+      "nodeIds": [
+        "id_osf7y6p",
+        "id_4md0r31",
+        "id_oz3xi5l",
+        "id_rj26k5u",
+        "id_2xpnq8x",
+        "id_df24465"
+      ]
+    },
+    {
+      "id": "id_axwr4g9",
+      "name": "Überall",
+      "nodeIds": [
+        "id_yimax4f",
+        "id_dpc3pz0",
+        "id_njsllmy"
+      ]
+    },
+    {
+      "id": "id_he1tsbl",
+      "name": "Eingang",
+      "nodeIds": [
+        "id_yg8daz2",
+        "id_ou9jkvt"
+      ]
+    },
+    {
+      "id": "id_ba2164b",
+      "name": "Loggia",
+      "nodeIds": [
+        "id_83ab5d7",
+        "id_90b8857"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "id_fjdhlq8",
+      "from": "id_o9f16sy",
+      "to": "id_607um3s",
+      "type": "lan",
+      "label": "LAN1 ↔ LAN1"
+    },
+    {
+      "id": "id_vruqn2w",
+      "from": "id_o9f16sy",
+      "to": "id_afxo87v",
+      "type": "lan",
+      "label": "Ethernet"
+    },
+    {
+      "id": "id_fy3ye2x",
+      "from": "id_afxo87v",
+      "to": "id_zstwhsw",
+      "type": "lan",
+      "label": "Ethernet"
+    },
+    {
+      "id": "id_hs5niv3",
+      "from": "id_afxo87v",
+      "to": "id_uibzu1z",
+      "type": "lan",
+      "label": "Ethernet"
+    },
+    {
+      "id": "id_kszbwiy",
+      "from": "id_o9f16sy",
+      "to": "id_cveyn9l",
+      "type": "lan",
+      "label": "Ethernet"
+    },
+    {
+      "id": "id_9g385oq",
+      "from": "id_o9f16sy",
+      "to": "id_nqbjm16",
+      "type": "lan",
+      "label": "Ethernet"
+    },
+    {
+      "id": "id_fgbm53s",
+      "from": "id_607um3s",
+      "to": "id_2h4bmmy",
+      "type": "lan",
+      "label": "Ethernet"
+    },
+    {
+      "id": "id_zu2ba6t",
+      "from": "id_o9f16sy",
+      "to": "id_d9tl94a",
+      "type": "wifi",
+      "label": "Wi-Fi"
+    },
+    {
+      "id": "id_o5buwk8",
+      "from": "id_o9f16sy",
+      "to": "id_0v1kmrm",
+      "type": "wifi",
+      "label": "Wi-Fi"
+    },
+    {
+      "id": "id_3syxupx",
+      "from": "id_cveyn9l",
+      "to": "id_sibndzb",
+      "type": "unknown",
+      "label": "USB"
+    },
+    {
+      "id": "id_niwni5r",
+      "from": "id_cveyn9l",
+      "to": "id_eh85v9o",
+      "type": "unknown",
+      "label": "Audio input 1"
+    },
+    {
+      "id": "id_lgj9vlg",
+      "from": "id_2h4bmmy",
+      "to": "id_eh85v9o",
+      "type": "unknown",
+      "label": "Audio input 2"
+    },
+    {
+      "id": "id_unpfeds",
+      "from": "id_eh85v9o",
+      "to": "id_jl762kd",
+      "type": "unknown",
+      "label": "Audio output"
+    },
+    {
+      "id": "id_zi1np03",
+      "from": "id_ho4lrm0",
+      "to": "id_xg5my8k",
+      "type": "unknown",
+      "label": "USB input"
+    },
+    {
+      "id": "id_hjlj53p",
+      "from": "id_ho4lrm0",
+      "to": "id_n6m5rje",
+      "type": "unknown",
+      "label": "USB input"
+    },
+    {
+      "id": "id_ciqfgxf",
+      "from": "id_ho4lrm0",
+      "to": "id_j3s0q27",
+      "type": "unknown",
+      "label": "USB input"
+    },
+    {
+      "id": "id_x25pwjq",
+      "from": "id_ho4lrm0",
+      "to": "id_2h4bmmy",
+      "type": "unknown",
+      "label": "USB output 1"
+    },
+    {
+      "id": "id_zmyd1v7",
+      "from": "id_ho4lrm0",
+      "to": "id_cveyn9l",
+      "type": "unknown",
+      "label": "USB output 2"
+    },
+    {
+      "id": "id_5ofh7c5",
+      "from": "id_o9f16sy",
+      "to": "id_ff9trfy",
+      "type": "wifi",
+      "label": "Wi-Fi"
+    },
+    {
+      "id": "id_4gvxyxd",
+      "from": "id_607um3s",
+      "to": "id_osf7y6p",
+      "type": "wifi",
+      "label": "Wi-Fi"
+    },
+    {
+      "id": "id_zhq02uf",
+      "from": "id_osf7y6p",
+      "to": "id_4md0r31",
+      "type": "wifi",
+      "label": "Wi-Fi"
+    },
+    {
+      "id": "id_0fa6pjv",
+      "from": "id_osf7y6p",
+      "to": "id_oz3xi5l",
+      "type": "wifi",
+      "label": "Wi-Fi"
+    },
+    {
+      "id": "id_js36rcn",
+      "from": "id_o9f16sy",
+      "to": "id_yimax4f",
+      "type": "wifi",
+      "label": "Wi-Fi"
+    },
+    {
+      "id": "id_4xlivf9",
+      "from": "id_osf7y6p",
+      "to": "id_dpc3pz0",
+      "type": "wifi",
+      "label": "Wi-Fi"
+    },
+    {
+      "id": "id_fkgq0jw",
+      "from": "id_osf7y6p",
+      "to": "id_njsllmy",
+      "type": "wifi",
+      "label": "Wi-Fi"
+    },
+    {
+      "id": "id_b993zpe",
+      "from": "id_o9f16sy",
+      "to": "id_rj26k5u",
+      "type": "wifi",
+      "label": "Wi-Fi"
+    },
+    {
+      "id": "id_fesf9m4",
+      "from": "id_o9f16sy",
+      "to": "id_2xpnq8x",
+      "type": "wifi",
+      "label": "Wi-Fi"
+    },
+    {
+      "id": "id_fi3iui0",
+      "from": "id_o9f16sy",
+      "to": "id_yg8daz2",
+      "type": "wifi",
+      "label": "Wi-Fi"
+    },
+    {
+      "id": "id_veujkd4",
+      "from": "id_dpc3pz0",
+      "to": "id_ou9jkvt",
+      "type": "unknown",
+      "label": "Bluetooth"
+    },
+    {
+      "id": "id_p67zhzd",
+      "from": "id_2xpnq8x",
+      "to": "id_ou9jkvt",
+      "type": "unknown",
+      "label": "Bluetooth"
+    },
+    {
+      "id": "id_p5fyjiw",
+      "from": "id_3gmgcxm",
+      "to": "id_rf0ur4u",
+      "type": "unknown",
+      "label": "USB"
+    },
+    {
+      "id": "id_q6j8is2",
+      "from": "id_o9f16sy",
+      "to": "id_3gmgcxm",
+      "type": "wifi",
+      "label": "Wi-Fi"
+    },
+    {
+      "id": "id_0cb4d24",
+      "from": "id_osf7y6p",
+      "to": "id_df24465",
+      "type": "lan",
+      "label": "Ethernet"
+    },
+    {
+      "id": "id_03a077a",
+      "from": "id_o9f16sy",
+      "to": "id_83ab5d7",
+      "type": "wifi",
+      "label": "Wi-Fi"
+    },
+    {
+      "id": "id_3be631b",
+      "from": "id_o9f16sy",
+      "to": "id_90b8857",
+      "type": "wifi",
+      "label": "Wi-Fi"
+    }
+  ]
+}
