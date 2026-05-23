@@ -946,7 +946,10 @@ $('save').onclick=()=>{
 ;
 $('json').onclick=()=>download('device-network-map.json',JSON.stringify(data,null,2),'application/json;charset=utf-8');
 $('showjson').onclick=()=>showJson();
-$('png').onclick=()=>exportPng();
+$('png').onclick=()=>openPngDialog();
+$('closePng').onclick=()=>closePngDialog();
+$('downloadPng').onclick=()=>downloadCurrentPng();
+$('hideSensitiveExport').onchange=()=>renderPngPreview();
 function showJson(){
   let j=JSON.stringify(data,null,2);
   panel.innerHTML=`<div class="row"><label>Editable JSON backup</label><textarea id="jsonout" style="min-height:360px;font-family:ui-monospace,Consolas,monospace;font-size:12px">${esc(j)}</textarea></div><div class="buttons"><button id="copyjson" class="primary small">Copy JSON</button><button id="selectjson" class="small">Select all</button></div><div class="hint">Save this text as <strong>device-network-map.json</strong>.</div>`;
@@ -979,9 +982,58 @@ function exportedSvgCss(){
   return `:root{--rb:${options.relatedBorder||5}px}${css}`
 }
 
-async function exportPng(){
+function openPngDialog(){
   if(!data.nodes.length){
     msg('Nothing to export.',true);
+    return
+  }
+
+  $('hideSensitiveExport').checked=false;
+  $('pngOverlay').hidden=false;
+  renderPngPreview()
+}
+
+function closePngDialog(){
+  $('pngOverlay').hidden=true;
+  $('preview').removeAttribute('src');
+  if(lastUrl){
+    URL.revokeObjectURL(lastUrl);
+    lastUrl=''
+  }
+}
+
+function renderPngPreview(){
+  createPngBlob($('hideSensitiveExport').checked,blob=>{
+    if(!blob)return;
+    if(lastUrl)URL.revokeObjectURL(lastUrl);
+    lastUrl=URL.createObjectURL(blob);
+    $('preview').src=lastUrl;
+    $('downloadPng').disabled=false
+  }
+  )
+}
+
+function downloadCurrentPng(){
+  if(!lastUrl){
+    msg('PNG preview is not ready yet.',true);
+    return
+  }
+
+  let a=document.createElement('a');
+  a.href=lastUrl;
+  a.download=lastImgName;
+  a.rel='noopener';
+  a.style.display='none';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  msg('Download requested.')
+}
+
+function createPngBlob(hideSensitive,done){
+  if(!data.nodes.length){
+    msg('Nothing to export.',true);
+    done(null);
     return
   }
 
@@ -995,6 +1047,7 @@ async function exportPng(){
 
   if(!box||!isFinite(box.width)||!isFinite(box.height)||box.width<=0||box.height<=0){
     msg('Nothing visible to export.',true);
+    done(null);
     return
   }
 
@@ -1015,6 +1068,12 @@ async function exportPng(){
   clone.removeAttribute('style');
   if(cloneVp)cloneVp.setAttribute('transform','');
   clone.querySelectorAll('.conn-hit').forEach(el=>el.remove());
+  if(hideSensitive){
+    let cloneNodes=clone.querySelector('#nodes'),
+      cloneLinks=clone.querySelector('#links');
+    if(cloneNodes)cloneNodes.innerHTML='';
+    if(cloneLinks)cloneLinks.innerHTML=''
+  }
 
   style.textContent=exportedSvgCss();
   if(defs)defs.appendChild(style);
@@ -1047,16 +1106,18 @@ async function exportPng(){
     canvas.toBlob(blob=>{
       if(!blob){
         msg('PNG export failed.',true);
+        done(null);
         return
       }
-      download(lastImgName,blob,'image/png')
+      done(blob)
     }
     ,'image/png')
   }
   ;
   img.onerror=()=>{
     URL.revokeObjectURL(url);
-    msg('PNG export failed.',true)
+    msg('PNG export failed.',true);
+    done(null)
   }
   ;
   img.src=url

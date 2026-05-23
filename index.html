@@ -204,6 +204,25 @@
       </div>
     </div>
 
+    <div id="pngOverlay" class="overlay" hidden>
+      <div class="dialog">
+        <div class="dh">
+          <strong>PNG Export Preview</strong>
+          <button id="closePng" class="small">Close</button>
+        </div>
+
+        <label class="check">
+          <input id="hideSensitiveExport" type="checkbox" style="width:auto;margin-right:8px">Hide sensitive nodes
+        </label>
+
+        <img id="preview" alt="PNG export preview">
+
+        <div class="buttons">
+          <button id="downloadPng" class="primary small">Download PNG</button>
+        </div>
+      </div>
+    </div>
+
     <script src="app.js"></script>
   </body>
 </html>
