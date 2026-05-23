@@ -3,7 +3,7 @@ let t={
   x:0,y:0,s:1
 }
 ,sel=new Set(),focusSel=new Set(),selC=null,drag=null,groupDrag=null,pan=null,lastUrl="",lastImgName="device-network-map.png",options=loadOptions(),filter={
-  kind:"",name:"",conn:"",hide:false
+  kind:"",name:"",conn:"",hide:false,sensitive:false
 }
 ,initialLayout=null,autoZoomLayout=true;
 const $=id=>document.getElementById(id),svg=$("svg"),vp=$("vp"),groups=$("groups"),links=$("links"),nodes=$("nodes"),panel=$("panel"),status=$("status");
@@ -109,15 +109,22 @@ function initFilters(){
     updateFilterButton()
   }
   ;
+  $('filterSensitive').onchange=e=>{
+    filter.sensitive=e.target.checked;
+    render();
+    updateFilterButton()
+  }
+  ;
   $('clearFilter').onclick=()=>{
     filter={
-      kind:'',name:'',conn:'',hide:false
+      kind:'',name:'',conn:'',hide:false,sensitive:false
     }
     ;
     s.value='';
     $('filterName').value='';
     $('filterConn').value='';
     $('filterHide').checked=false;
+    $('filterSensitive').checked=false;
     render();
     updateFilterButton();
     msg('Filter reset.')
@@ -137,6 +144,9 @@ function nodeMatchesFilter(n){
   let k=n.kind||n.type||'other',txt=(n.name+' '+(n.subtitle||'')+' '+(n.notes||'')).toLowerCase();
   return(!filter.kind||k===filter.kind)&&(!filter.name||txt.includes(filter.name))
 }
+function nodeHiddenBySensitive(n){
+  return filter.sensitive&&!!n.sensitive
+}
 function connectionKind(c){
   if(c.type==='lan'||c.type==='wifi')return c.type;
   let txt=((c.label||'')+' '+(c.type||'')).toLowerCase();
@@ -146,7 +156,7 @@ function connMatchesFilter(c){
   return !filter.conn||connectionKind(c)===filter.conn
 }
 function filterActive(){
-  return!!(filter.kind||filter.name||filter.conn)
+  return!!(filter.kind||filter.name||filter.conn||filter.sensitive)
 }
 function updateFilterButton(){
   let w=$('filterWarn');
@@ -182,6 +192,11 @@ function portBarSvg(n){
 function wifiBadgeSvg(n){
   let c=wifiCount(n);
   return c?`<g opacity=".78"><path d="M145 15 Q153 7 161 15" fill="none" stroke="#166534" stroke-width="1.5" stroke-linecap="round"/><path d="M149 19 Q153 15 157 19" fill="none" stroke="#166534" stroke-width="1.5" stroke-linecap="round"/><circle cx="153" cy="22" r="1.5" fill="#166534"/><text x="162" y="21" font-size="10" font-weight="700" fill="#166534">${c}</text></g>`:''
+}
+function sensitiveIconSvg(n){
+  if(!n.sensitive)return'';
+  let y=nodeH()-17;
+  return`<g class="sensitiveIcon" transform="translate(164 ${y}) scale(.5)"><path d="M0 10 Q10 0 20 10 Q10 20 0 10Z" fill="none" stroke="#b91c1c" stroke-width="2" stroke-linejoin="round" opacity=".82"/><circle cx="10" cy="10" r="3" fill="#b91c1c" opacity=".82"/><path d="M2 20 L20 0" stroke="#b91c1c" stroke-width="2.4" stroke-linecap="round" opacity=".82"/></g>`
 }
 function wrapWords(s,max){
   let words=String(s||'').replaceAll('  ',' ').split(' '),lines=[''];
@@ -341,10 +356,12 @@ function render(){
   for(const c of data.connections){
     let a=data.nodes.find(n=>n.id===c.from),b=data.nodes.find(n=>n.id===c.to);
     if(!a||!b)continue;
+    if(nodeHiddenBySensitive(a)||nodeHiddenBySensitive(b))continue;
     let fm=nodeMatchesFilter(a)&&nodeMatchesFilter(b)&&connMatchesFilter(c);
     if(fa&&filter.hide&&!fm)continue;
     let x1=a.x+W/2,y1=a.y+nodeH()/2,x2=b.x+W/2,y2=b.y+nodeH()/2,cv=Math.min(90,Math.max(30,Math.hypot(x2-x1,y2-y1)*.18)),p=`M${x1} ${y1}C${x1+cv} ${y1},${x2-cv} ${y2},${x2} ${y2}`;
     let hit=document.createElementNS('http://www.w3.org/2000/svg','path');
+    hit.setAttribute('data-conn-id',c.id);
     hit.setAttribute('d',p);
     hit.setAttribute('class',fa&&!fm?'conn-hit filteredDim':'conn-hit');
     hit.onpointerdown=e=>{
@@ -357,6 +374,7 @@ function render(){
     ;
     links.appendChild(hit);
     let path=document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('data-conn-id',c.id);
     path.setAttribute('d',p);
     path.setAttribute('class',`conn ${c.type||'unknown'}${selC===c.id?' sel':''}${f.rc.has(c.id)?' related':''}${options.dimUnrelated&&f.active&&!f.rc.has(c.id)?' dimmed':''}${fa&&!fm?' filteredDim':''}`);
     path.setAttribute('marker-end',`url(#${marker(c.type)})`);
@@ -370,6 +388,7 @@ function render(){
     ;
     links.appendChild(path);
     let lab=document.createElementNS('http://www.w3.org/2000/svg','text');
+    lab.setAttribute('data-conn-id',c.id);
     lab.setAttribute('class',`clabel${options.dimUnrelated&&f.active&&!f.rc.has(c.id)?' dimmed':''}${fa&&!fm?' filteredDim':''}`);
     lab.setAttribute('x',(x1+x2)/2);
     lab.setAttribute('y',(y1+y2)/2-8);
@@ -379,11 +398,13 @@ function render(){
   }
   for(const n of data.nodes){
     let nm=nodeMatchesFilter(n),nh=nodeH();
+    if(nodeHiddenBySensitive(n))continue;
     if(fa&&filter.hide&&!nm)continue;
     let g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('data-node-id',n.id);
     g.setAttribute('class',`node${sel.has(n.id)?' sel':''}${focusSel.has(n.id)||f.rn.has(n.id)?' related':''}${options.dimUnrelated&&f.active&&!focusSel.has(n.id)&&!f.rn.has(n.id)?' dimmed':''}${fa&&!nm?' filteredDim':''}`);
     g.setAttribute('transform',`translate(${n.x} ${n.y})`);
-    g.innerHTML=`<rect width="${W}" height="${nh}" rx="6" ry="6" fill="${boxFill(n)}"/>${iconSvg(n)}${wifiBadgeSvg(n)}${titleSvg(n)}<text class="sub" x="52" y="55">${esc(trunc(n.subtitle||n.type,textMax(n,20,12)))}</text>${options.showNotes?`<text class="note" x="14" y="70">${esc(trunc(n.notes||'',28))}</text>`:''}${portBarSvg(n)}`;
+    g.innerHTML=`<rect width="${W}" height="${nh}" rx="6" ry="6" fill="${boxFill(n)}"/>${iconSvg(n)}${wifiBadgeSvg(n)}${titleSvg(n)}<text class="sub" x="52" y="55">${esc(trunc(n.subtitle||n.type,textMax(n,20,12)))}</text>${options.showNotes?`<text class="note" x="14" y="70">${esc(trunc(n.notes||'',28))}</text>`:''}${portBarSvg(n)}${sensitiveIconSvg(n)}`;
     g.oncontextmenu=e=>{
       e.preventDefault();
       e.stopPropagation();
@@ -441,7 +462,7 @@ function renderGroups(){
   if(!Array.isArray(data.groups))data.groups=[];
   let fa=filterActive();
   for(const gr of data.groups){
-    let all=(gr.nodeIds||[]).map(id=>data.nodes.find(n=>n.id===id)).filter(Boolean),bs=fa&&filter.hide?all.filter(nodeMatchesFilter):all;
+    let all=(gr.nodeIds||[]).map(id=>data.nodes.find(n=>n.id===id)).filter(Boolean).filter(n=>!nodeHiddenBySensitive(n)),bs=fa&&filter.hide?all.filter(nodeMatchesFilter):all;
     if(!bs.length)continue;
     let any=!fa||all.some(nodeMatchesFilter),pad=34,x=Math.min(...bs.map(n=>n.x))-pad,y=Math.min(...bs.map(n=>n.y))-pad-20,w=Math.max(...bs.map(n=>n.x+W))-x+pad,h=Math.max(...bs.map(n=>n.y+nodeH()))-y+pad,g=document.createElementNS('http://www.w3.org/2000/svg','g');
     g.setAttribute('class',`group${fa&&!any?' filteredDim':''}`);
@@ -512,13 +533,14 @@ function edit(){
   }
   if(ns.length===1){
     let n=ns[0];
-    panel.innerHTML=`<div class="row"><label>Name</label><input id="en" value="${esc(n.name)}"></div><div class="row"><label>Type</label><select id="et"><option value="router" ${n.type==='router'?'selected':''}>Router / gateway</option><option value="infra" ${n.type==='infra'?'selected':''}>Infrastructure</option><option value="client" ${n.type==='client'?'selected':''}>Client device</option><option value="other" ${n.type==='other'?'selected':''}>Other</option></select></div><div class="row"><label>Device symbol</label><select id="ek">${kindOptions(n.kind||n.type)}</select></div><div class="row"><label>Subtitle</label><input id="es" value="${esc(n.subtitle)}"></div><div class="row"><label>Port count</label><input id="ep" type="number" min="0" step="1" value="${portCount(n)}"></div><div class="hint" style="margin-bottom:9px">Used LAN/Ethernet ports: ${usedPorts(n)} / ${portCount(n)}</div><div class="row"><label>Notes</label><textarea id="eno">${esc(n.notes)}</textarea></div><div class="buttons"><button id="savn" class="primary small">Apply</button><button id="dupn" class="small">Duplicate</button><button id="deln" class="danger small">Delete</button></div>`;
+    panel.innerHTML=`<div class="row"><label>Name</label><input id="en" value="${esc(n.name)}"></div><div class="row"><label>Type</label><select id="et"><option value="router" ${n.type==='router'?'selected':''}>Router / gateway</option><option value="infra" ${n.type==='infra'?'selected':''}>Infrastructure</option><option value="client" ${n.type==='client'?'selected':''}>Client device</option><option value="other" ${n.type==='other'?'selected':''}>Other</option></select></div><div class="row"><label>Device symbol</label><select id="ek">${kindOptions(n.kind||n.type)}</select></div><div class="row"><label>Subtitle</label><input id="es" value="${esc(n.subtitle)}"></div><div class="row"><label>Port count</label><input id="ep" type="number" min="0" step="1" value="${portCount(n)}"></div><div class="hint" style="margin-bottom:9px">Used LAN/Ethernet ports: ${usedPorts(n)} / ${portCount(n)}</div><div class="row"><label><input id="esen" type="checkbox" style="width:auto;margin-right:8px" ${n.sensitive?'checked':''}>Sensitive node</label></div><div class="row"><label>Notes</label><textarea id="eno">${esc(n.notes)}</textarea></div><div class="buttons"><button id="savn" class="primary small">Apply</button><button id="dupn" class="small">Duplicate</button><button id="deln" class="danger small">Delete</button></div>`;
     $('savn').onclick=()=>{
       n.name=$('en').value||'Unnamed device';
       n.type=$('et').value;
       n.kind=$('ek').value;
       n.subtitle=$('es').value;
       n.portCount=Math.max(0,parseInt($('ep').value)||0);
+      n.sensitive=$('esen').checked;
       n.notes=$('eno').value;
       save();
       render();
@@ -633,7 +655,7 @@ svg.onwheel=e=>{
 
 $('add').onclick=()=>{
   let r=svg.getBoundingClientRect(),c=world(r.left+r.width/2,r.top+r.height/2),n={
-    id:uid(),name:'New device',type:'client',kind:'client',portCount:0,subtitle:'Edit me',notes:'',x:Math.round(c.x-W/2),y:Math.round(c.y-H/2)
+    id:uid(),name:'New device',type:'client',kind:'client',portCount:0,subtitle:'Edit me',notes:'',sensitive:false,x:Math.round(c.x-W/2),y:Math.round(c.y-H/2)
   }
   ;
   data.nodes.push(n);
@@ -1069,10 +1091,16 @@ function createPngBlob(hideSensitive,done){
   if(cloneVp)cloneVp.setAttribute('transform','');
   clone.querySelectorAll('.conn-hit').forEach(el=>el.remove());
   if(hideSensitive){
-    let cloneNodes=clone.querySelector('#nodes'),
-      cloneLinks=clone.querySelector('#links');
-    if(cloneNodes)cloneNodes.innerHTML='';
-    if(cloneLinks)cloneLinks.innerHTML=''
+    let sensitiveIds=new Set(data.nodes.filter(n=>n.sensitive).map(n=>n.id)),
+      sensitiveConnIds=new Set(data.connections.filter(c=>sensitiveIds.has(c.from)||sensitiveIds.has(c.to)).map(c=>c.id));
+    clone.querySelectorAll('[data-node-id]').forEach(el=>{
+      if(sensitiveIds.has(el.getAttribute('data-node-id')))el.remove()
+    }
+    );
+    clone.querySelectorAll('[data-conn-id]').forEach(el=>{
+      if(sensitiveConnIds.has(el.getAttribute('data-conn-id')))el.remove()
+    }
+    )
   }
 
   style.textContent=exportedSvgCss();
