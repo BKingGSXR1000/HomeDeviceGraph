@@ -1,7 +1,208 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Interactive Device Network Map</title><link rel="stylesheet" href="style.css"></head><body>
-<header><h1>Interactive Device Network Map</h1><div id="status" class="status"></div></header>
-<div class="toolbar"><div class="toolLeft"><button id="add" class="primary">Add device</button><button id="connect">Connect selected</button><div class="layoutWrap"><button id="layoutBtn">Layout ▾</button><div id="layoutMenu" class="layoutMenu" hidden><button id="layout">Auto layout</button><button id="layoutExp">Experimental layout</button><button id="resetLayout">Reset layout</button><label class="check" style="padding:6px 8px"><input id="autoZoomLayout" type="checkbox" checked style="width:auto;margin-right:6px">Auto zoom</label></div></div><button id="group">Group selected</button><button id="filterBtn" class="filterBtn"><svg class="filterIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6 7v5l-4 2v-7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span>Filter</span><span id="filterWarn" class="filterWarn" hidden>⚠</span></button></div><div class="systemWrap"><button id="systemBtn">System ▾</button><div id="systemMenu" class="systemMenu" hidden><button id="options">Options</button><button id="save">Save locally</button><button id="json">Download JSON</button><button id="showjson">Show / Copy JSON</button><label class="file" for="file">Load JSON</label><input id="file" type="file" accept="application/json,.json"><button id="reset" class="danger">Reset empty map</button></div></div></div>
-<div id="filterbar" class="filterbar" hidden><label>Filter type</label><select id="filterKind"></select><label>Name contains</label><input id="filterName" type="search" placeholder="e.g. webcam, router"><label>Connection type</label><select id="filterConn"><option value="">All connections</option><option value="lan">Ethernet / LAN</option><option value="wifi">Wi-Fi</option><option value="usb">USB</option><option value="other">Other</option></select><label class="check"><input id="filterHide" type="checkbox"> Hide non-matching</label><button id="clearFilter" class="small">Reset filter</button><button id="closeFilter" class="small">×</button></div>
-<main><div id="wrap"><svg id="svg"><defs><marker id="al" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#1d4ed8"/></marker><marker id="aw" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#16a34a"/></marker><marker id="au" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#64748b"/></marker></defs><g id="vp"><g id="groups"></g><g id="links"></g><g id="nodes"></g></g></svg></div><aside><div class="sec"><h2>Selection</h2><div id="panel" class="hint">Select a device or connection to edit it.</div></div><div class="sec"><h2>Add connection manually</h2><div class="row"><label>From</label><select id="from"></select></div><div class="row"><label>To</label><select id="to"></select></div><div class="row"><label>Type</label><select id="ctype"><option value="lan">Ethernet / LAN</option><option value="wifi">Wi-Fi</option><option value="unknown">Unknown / other</option></select></div><div class="row"><label>Label / ports</label><input id="clabel" placeholder="e.g. LAN1 → WAN"></div><button id="addconn">Add connection</button></div><div class="sec"><h2>Legend</h2><div class="legend"><span><i class="ls lan"></i>Ethernet / LAN</span><span><i class="ls wifi"></i>Wi-Fi</span><span><i class="ls"></i>Unknown / other</span></div></div><div class="sec hint"><strong>Usage:</strong><br>Drag devices. Shift-click for multi-select. Right-click a device to highlight its direct connections. Right-click empty space or a group box to clear highlight mode. JSON is the editable backup.</div></aside></main>
-<div id="optionsOverlay" class="overlay" hidden><div class="dialog"><div class="dh"><strong>Options</strong><button id="closeOptions" class="small">Close</button></div><div class="row"><label>Connected box border thickness</label><input id="relatedBorderInput" type="number" min="1" max="16" step="1" value="5"></div><div class="row"><label><input id="dimUnrelatedInput" type="checkbox" style="width:auto;margin-right:8px">Dim unrelated items in right-click highlight mode</label></div><div class="row"><label><input id="showNotesInput" type="checkbox" style="width:auto;margin-right:8px">Show notes inside device boxes</label></div><div class="buttons"><button id="applyOptions" class="primary small">Apply</button><button id="defaultOptions" class="small">Defaults</button></div></div></div>
-<script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Interactive Device Network Map</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <header>
+      <h1>Interactive Device Network Map</h1>
+      <div id="status" class="status"></div>
+    </header>
+
+    <div class="toolbar">
+      <div class="toolLeft">
+        <button id="add" class="primary">Add device</button>
+        <button id="connect">Connect selected</button>
+
+        <div class="layoutWrap">
+          <button id="layoutBtn">Layout ▾</button>
+          <div id="layoutMenu" class="layoutMenu" hidden>
+            <button id="layout">Auto layout</button>
+            <button id="layoutExp">Experimental layout</button>
+            <button id="resetLayout">Reset layout</button>
+            <label class="check" style="padding:6px 8px">
+              <input id="autoZoomLayout" type="checkbox" checked style="width:auto;margin-right:6px">Auto zoom
+            </label>
+          </div>
+        </div>
+
+        <button id="group">Group selected</button>
+        <button id="filterBtn" class="filterBtn">
+          <svg class="filterIcon" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M4 5h16l-6 7v5l-4 2v-7z"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <span>Filter</span>
+          <span id="filterWarn" class="filterWarn" hidden>⚠</span>
+        </button>
+      </div>
+
+      <div class="systemWrap">
+        <button id="systemBtn">System ▾</button>
+        <div id="systemMenu" class="systemMenu" hidden>
+          <button id="options">Options</button>
+          <button id="save">Save locally</button>
+          <button id="json">Download JSON</button>
+          <button id="showjson">Show / Copy JSON</button>
+          <label class="file" for="file">Load JSON</label>
+          <input id="file" type="file" accept="application/json,.json">
+          <button id="reset" class="danger">Reset empty map</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="filterbar" class="filterbar" hidden>
+      <label>Filter type</label>
+      <select id="filterKind"></select>
+      <label>Name contains</label>
+      <input id="filterName" type="search" placeholder="e.g. webcam, router">
+      <label>Connection type</label>
+      <select id="filterConn">
+        <option value="">All connections</option>
+        <option value="lan">Ethernet / LAN</option>
+        <option value="wifi">Wi-Fi</option>
+        <option value="usb">USB</option>
+        <option value="other">Other</option>
+      </select>
+      <label class="check">
+        <input id="filterHide" type="checkbox"> Hide non-matching
+      </label>
+      <button id="clearFilter" class="small">Reset filter</button>
+      <button id="closeFilter" class="small">×</button>
+    </div>
+
+    <main>
+      <div id="wrap">
+        <svg id="svg">
+          <defs>
+            <marker
+              id="al"
+              viewBox="0 0 10 10"
+              refX="8"
+              refY="5"
+              markerWidth="6"
+              markerHeight="6"
+              orient="auto-start-reverse"
+            >
+              <path d="M0 0L10 5L0 10z" fill="#1d4ed8"/>
+            </marker>
+            <marker
+              id="aw"
+              viewBox="0 0 10 10"
+              refX="8"
+              refY="5"
+              markerWidth="6"
+              markerHeight="6"
+              orient="auto-start-reverse"
+            >
+              <path d="M0 0L10 5L0 10z" fill="#16a34a"/>
+            </marker>
+            <marker
+              id="au"
+              viewBox="0 0 10 10"
+              refX="8"
+              refY="5"
+              markerWidth="6"
+              markerHeight="6"
+              orient="auto-start-reverse"
+            >
+              <path d="M0 0L10 5L0 10z" fill="#64748b"/>
+            </marker>
+          </defs>
+          <g id="vp">
+            <g id="groups"></g>
+            <g id="links"></g>
+            <g id="nodes"></g>
+          </g>
+        </svg>
+      </div>
+
+      <aside>
+        <div class="sec">
+          <h2>Selection</h2>
+          <div id="panel" class="hint">Select a device or connection to edit it.</div>
+        </div>
+
+        <div class="sec">
+          <h2>Add connection manually</h2>
+          <div class="row">
+            <label>From</label>
+            <select id="from"></select>
+          </div>
+          <div class="row">
+            <label>To</label>
+            <select id="to"></select>
+          </div>
+          <div class="row">
+            <label>Type</label>
+            <select id="ctype">
+              <option value="lan">Ethernet / LAN</option>
+              <option value="wifi">Wi-Fi</option>
+              <option value="unknown">Unknown / other</option>
+            </select>
+          </div>
+          <div class="row">
+            <label>Label / ports</label>
+            <input id="clabel" placeholder="e.g. LAN1 → WAN">
+          </div>
+          <button id="addconn">Add connection</button>
+        </div>
+
+        <div class="sec">
+          <h2>Legend</h2>
+          <div class="legend">
+            <span><i class="ls lan"></i>Ethernet / LAN</span>
+            <span><i class="ls wifi"></i>Wi-Fi</span>
+            <span><i class="ls"></i>Unknown / other</span>
+          </div>
+        </div>
+
+        <div class="sec hint">
+          <strong>Usage:</strong><br>
+          Drag devices. Shift-click for multi-select. Right-click a device to highlight its direct connections. Right-click empty space or a group box to clear highlight mode. JSON is the editable backup.
+        </div>
+      </aside>
+    </main>
+
+    <div id="optionsOverlay" class="overlay" hidden>
+      <div class="dialog">
+        <div class="dh">
+          <strong>Options</strong>
+          <button id="closeOptions" class="small">Close</button>
+        </div>
+
+        <div class="row">
+          <label>Connected box border thickness</label>
+          <input id="relatedBorderInput" type="number" min="1" max="16" step="1" value="5">
+        </div>
+
+        <div class="row">
+          <label>
+            <input id="dimUnrelatedInput" type="checkbox" style="width:auto;margin-right:8px">Dim unrelated items in right-click highlight mode
+          </label>
+        </div>
+
+        <div class="row">
+          <label>
+            <input id="showNotesInput" type="checkbox" style="width:auto;margin-right:8px">Show notes inside device boxes
+          </label>
+        </div>
+
+        <div class="buttons">
+          <button id="applyOptions" class="primary small">Apply</button>
+          <button id="defaultOptions" class="small">Defaults</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
