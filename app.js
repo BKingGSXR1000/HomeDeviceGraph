@@ -946,6 +946,7 @@ $('save').onclick=()=>{
 ;
 $('json').onclick=()=>download('device-network-map.json',JSON.stringify(data,null,2),'application/json;charset=utf-8');
 $('showjson').onclick=()=>showJson();
+$('png').onclick=()=>exportPng();
 function showJson(){
   let j=JSON.stringify(data,null,2);
   panel.innerHTML=`<div class="row"><label>Editable JSON backup</label><textarea id="jsonout" style="min-height:360px;font-family:ui-monospace,Consolas,monospace;font-size:12px">${esc(j)}</textarea></div><div class="buttons"><button id="copyjson" class="primary small">Copy JSON</button><button id="selectjson" class="small">Select all</button></div><div class="hint">Save this text as <strong>device-network-map.json</strong>.</div>`;
@@ -964,6 +965,103 @@ function showJson(){
     $('jsonout').select()
   }
 }
+
+function exportedSvgCss(){
+  let css='';
+  try{
+    for(const sheet of document.styleSheets){
+      for(const rule of sheet.cssRules)css+=rule.cssText+'\n'
+    }
+  }
+  catch{
+    css='.conn{fill:none;stroke-width:3;stroke-linecap:round}.conn.lan{stroke:#1d4ed8}.conn.wifi{stroke:#16a34a;stroke-dasharray:8 8}.conn.unknown{stroke:#64748b;stroke-dasharray:3 7}.clabel{font-size:12px;fill:#334155;paint-order:stroke;stroke:#fff;stroke-width:4px}.title{font-size:14px;font-weight:700;fill:#0f172a}.sub{font-size:12px;fill:#475569}.note{font-size:11px;fill:#64748b}.gbox{fill:rgba(245,158,11,.08);stroke:#f59e0b;stroke-width:2;stroke-dasharray:8 6}.gtext{font-size:13px;font-weight:700;fill:#92400e;paint-order:stroke;stroke:#fff;stroke-width:4px}.ghandle,.ghandletext{display:none}.node{filter:drop-shadow(0 8px 14px rgba(15,23,42,.13))}.node>rect:first-child{stroke:#94a3b8;stroke-width:1.5}.node.sel>rect:first-child{stroke:#2563eb;stroke-width:3}.node.related>rect:first-child{stroke:#f59e0b;stroke-width:var(--rb);stroke-dasharray:8 4}.dimmed{opacity:.25}.filteredDim{opacity:.15}'
+  }
+  return `:root{--rb:${options.relatedBorder||5}px}${css}`
+}
+
+async function exportPng(){
+  if(!data.nodes.length){
+    msg('Nothing to export.',true);
+    return
+  }
+
+  let box;
+  try{
+    box=vp.getBBox()
+  }
+  catch{
+    box=contentBounds()
+  }
+
+  if(!box||!isFinite(box.width)||!isFinite(box.height)||box.width<=0||box.height<=0){
+    msg('Nothing visible to export.',true);
+    return
+  }
+
+  let pad=80,
+    x=box.x-pad,
+    y=box.y-pad,
+    w=box.width+pad*2,
+    h=box.height+pad*2,
+    clone=svg.cloneNode(true),
+    cloneVp=clone.querySelector('#vp'),
+    defs=clone.querySelector('defs'),
+    style=document.createElementNS('http://www.w3.org/2000/svg','style');
+
+  clone.setAttribute('xmlns','http://www.w3.org/2000/svg');
+  clone.setAttribute('width',w);
+  clone.setAttribute('height',h);
+  clone.setAttribute('viewBox',`${x} ${y} ${w} ${h}`);
+  clone.removeAttribute('style');
+  if(cloneVp)cloneVp.setAttribute('transform','');
+  clone.querySelectorAll('.conn-hit').forEach(el=>el.remove());
+
+  style.textContent=exportedSvgCss();
+  if(defs)defs.appendChild(style);
+  else clone.insertBefore(style,clone.firstChild);
+
+  let bg=document.createElementNS('http://www.w3.org/2000/svg','rect');
+  bg.setAttribute('x',x);
+  bg.setAttribute('y',y);
+  bg.setAttribute('width',w);
+  bg.setAttribute('height',h);
+  bg.setAttribute('fill','#ffffff');
+  clone.insertBefore(bg,clone.firstChild);
+
+  let svgText=new XMLSerializer().serializeToString(clone),
+    svgBlob=new Blob([svgText],{type:'image/svg+xml;charset=utf-8'}),
+    url=URL.createObjectURL(svgBlob),
+    img=new Image();
+
+  img.onload=()=>{
+    let scale=Math.min(2,4096/Math.max(w,h)),
+      canvas=document.createElement('canvas'),
+      ctx=canvas.getContext('2d');
+
+    canvas.width=Math.max(1,Math.round(w*scale));
+    canvas.height=Math.max(1,Math.round(h*scale));
+    ctx.fillStyle='#ffffff';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    URL.revokeObjectURL(url);
+    canvas.toBlob(blob=>{
+      if(!blob){
+        msg('PNG export failed.',true);
+        return
+      }
+      download(lastImgName,blob,'image/png')
+    }
+    ,'image/png')
+  }
+  ;
+  img.onerror=()=>{
+    URL.revokeObjectURL(url);
+    msg('PNG export failed.',true)
+  }
+  ;
+  img.src=url
+}
+
 async function loadJsonFile(f){
   if(!f)return;
   if(!/\.json$/i.test(f.name)&&f.type&&f.type!=='application/json'){
